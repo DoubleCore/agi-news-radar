@@ -1,152 +1,82 @@
-# AI Signal Board
+<div align="center">
 
-中文 | [English](#english)
+# AI Signal Board — Fork Experiment
 
-高质量 AI/科技新闻聚合项目，支持静态网页展示、24h 增量更新、WaytoAGI 更新日志、OPML RSS 批量接入、失败源替换与告警。
+**AI News Radar · RSS / OPML · GitHub Actions**
 
-说明：本仓库已适配公开发布，**不会包含作者私有 RSS 订阅文件**。
+![Fork](https://img.shields.io/badge/Repository-Fork-6E7781?style=flat-square&logo=github)
+![Python](https://img.shields.io/badge/Pipeline-Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![Actions](https://img.shields.io/badge/Automation-GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)
 
-## 中文
+A fork-based experiment built from [`LearnPrompt/ai-news-radar`](https://github.com/LearnPrompt/ai-news-radar).
 
-### 1. 这个项目每天更新需要一直开 Codex 吗？
+</div>
 
-不需要。  
-你只要执行一个命令，或者直接用 GitHub Actions 定时运行即可。
+## Repository Context
 
-- 本地命令（一次）：
-  - `python scripts/update_news.py --output-dir data --window-hours 24 --rss-opml feeds/follow.opml`
-- 自动化（推荐）：
-  - `.github/workflows/update-news.yml` 已配置定时任务，默认每 30 分钟自动更新并提交数据。
+This repository is **not the original AI News Radar project**. The upstream architecture and original implementation belong to LearnPrompt and its contributors.
 
-### 2. 主要能力
+I keep this fork as a practical experiment in building a personal **AI information radar**: collect multiple sources, normalize them, keep a short time window, and publish a lightweight signal board that can update automatically.
 
-- 10 个网页源聚合（TechURLs / Buzzing / Info Flow / BestBlogs / TopHub / Zeli / AI HubToday / AIbase / AI今日热榜 / NewsNow）
-- OPML RSS 批量接入（私有文件 `feeds/follow.opml`，仓库提供模板 `feeds/follow.example.opml`）
-- 24h 双视图：`AI强相关` / `全量`
-- 全量模式去重开关
-- AI 模式默认去重
-- 站点与分区聚合展示
-- 中英双语标题显示
-- WaytoAGI：`当天` / `近7日` 切换
-- RSS 失败源自动处理：
-  - 能替换官方源则自动替换
-  - 无官方 RSS 的源自动跳过，避免浪费抓取时间
-- 告警数据输出：
-  - `failed_feeds` / `zero_item_feeds` / `skipped_feeds` / `replaced_feeds`
+## Local Experiment Scope
 
-### 3. 数据输出
+The current fork explores:
 
-- `data/latest-24h.json`
-- `data/archive.json`
-- `data/source-status.json`
-- `data/waytoagi-7d.json`
-- `data/title-zh-cache.json`
+- multi-source AI / technology news aggregation;
+- OPML-based RSS ingestion;
+- 24-hour rolling views;
+- source grouping and deduplication;
+- bilingual title presentation;
+- source health / failure reporting;
+- scheduled updates through GitHub Actions;
+- a static browser-based output that does not require a long-running application server.
 
-### 4. 快速开始
+## Data Flow
+
+```text
+Web sources + RSS / OPML
+          |
+          v
+   Update pipeline
+          |
+     normalize / dedup
+          |
+          v
+      JSON outputs
+          |
+          v
+   Static signal board
+```
+
+## Local Run
 
 ```bash
-cd /Users/carl/Downloads/10_项目代码/01_内容自动化与发布/ai-news-radar
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp feeds/follow.example.opml feeds/follow.opml
-# 把你自己的 OPML 内容替换到 feeds/follow.opml（不要提交到仓库）
 python scripts/update_news.py --output-dir data --window-hours 24 --rss-opml feeds/follow.opml
 python -m http.server 8080
 ```
 
-打开：`http://localhost:8080`
+Then open `http://localhost:8080`.
 
-### 5. Secrets / API 配置说明（重要）
+On Windows, use the equivalent virtual-environment activation command.
 
-默认情况下，本项目 **不需要任何 API Key** 才能运行核心抓取流程。  
-你目前没有提供 API 密钥，仓库中也不会写入任何密钥信息。
+## Automation
 
-推荐仅在运行环境中配置（不要提交到仓库）：
+The repository includes a GitHub Actions workflow for scheduled refreshes. Private RSS subscriptions or API credentials should be supplied through environment variables / repository secrets and should never be committed.
 
-- 代理（可选）：
-  - `HTTP_PROXY`
-  - `HTTPS_PROXY`
-- 如果你未来接入私有 API/私有 RSS：
-  - 把密钥放到 GitHub Secrets（Actions）或本地环境变量
-  - 不要写入代码、README、日志、`.env` 示例中的真实值
-- 私有 RSS OPML（推荐）：
-  - GitHub Actions Secret：`FOLLOW_OPML_B64`
-  - 生成方式（macOS/Linux）：
-    - `base64 < feeds/follow.opml | pbcopy`（macOS）
-    - 然后把内容粘贴到 GitHub 仓库的 Secrets
+## Why It Is in My Portfolio
 
-### 6. GitHub 自动更新
+This fork is useful as an **information-engineering exercise**: turning a noisy stream of public information into a repeatable collection, filtering, monitoring, and publishing pipeline.
 
-工作流：`.github/workflows/update-news.yml`
+## Upstream
 
-- 定时：每 30 分钟
-- 任务：执行抓取命令并提交 `data/*`
-- RSS OPML：若设置了 `FOLLOW_OPML_B64`，工作流会自动解码为 `feeds/follow.opml`
-- 推送权限：使用 `GITHUB_TOKEN`（workflow 内）
+Canonical project: [`LearnPrompt/ai-news-radar`](https://github.com/LearnPrompt/ai-news-radar)
 
----
+Use upstream documentation for the original project, official feature set, licensing, and current releases.
 
-## English
+## Status
 
-Production-grade AI/tech news aggregator with a static web UI, 24h updates, WaytoAGI timeline, and OPML RSS ingestion.
-
-This repo is safe for public release and does **not** include the maintainer's private RSS subscription file.
-
-### 1. Do I need Codex running all day?
-
-No.  
-You only need to run one command, or let GitHub Actions run it on schedule.
-
-- One-shot local command:
-  - `python scripts/update_news.py --output-dir data --window-hours 24 --rss-opml feeds/follow.opml`
-- Scheduled automation:
-  - `.github/workflows/update-news.yml` runs every 30 minutes and commits updated data.
-
-### 2. Core features
-
-- Multi-source web aggregation
-- OPML RSS ingestion (private `feeds/follow.opml`; template provided as `feeds/follow.example.opml`)
-- 24h two-mode UI (`AI-focused` / `All`)
-- Dedup toggle in All mode, dedup-by-default in AI mode
-- Site + section grouping
-- Bilingual title rendering
-- WaytoAGI toggle (`Today` / `Last 7 Days`)
-- RSS resilience:
-  - Auto-replace failed feeds with official sources when available
-  - Auto-skip unsupported source types (to save crawl time)
-- Alert-friendly status output (`failed_feeds`, `zero_item_feeds`, `skipped_feeds`, `replaced_feeds`)
-
-### 3. Output files
-
-- `data/latest-24h.json`
-- `data/archive.json`
-- `data/source-status.json`
-- `data/waytoagi-7d.json`
-- `data/title-zh-cache.json`
-
-### 4. Quick start
-
-```bash
-cd /Users/carl/Downloads/10_项目代码/01_内容自动化与发布/ai-news-radar
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp feeds/follow.example.opml feeds/follow.opml
-# Replace with your own OPML subscriptions (do not commit this file)
-python scripts/update_news.py --output-dir data --window-hours 24 --rss-opml feeds/follow.opml
-python -m http.server 8080
-```
-
-Open: `http://localhost:8080`
-
-### 5. Secrets / API notes
-
-By default, this project needs **no API keys** for the core pipeline.  
-No secrets are stored in this repo.
-
-If you later add private APIs/feeds:
-
-- Use environment variables or GitHub Secrets
-- Never commit real tokens/keys
-- For private RSS OPML in GitHub Actions, store `base64` content in secret `FOLLOW_OPML_B64`
+`Fork-based Experiment` · `Information Pipeline` · `Automation Practice`
